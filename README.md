@@ -2,6 +2,30 @@
 
 Interpolates transform's position, rotation or scale over a period of time.
 
+<b>Interpolation Types (inbuilt) </b>: 
+<ul>
+  <li>LINEAR</li>
+  <li>EASE IN</li>
+  <li>EASE OUT</li>
+</ul>
+<b>EASE IN and EASE OUT follow following equation</b>
+<b>By default strength of the curve is set to 3</b>
+<b>You can change it in AddTarget method</b>
+
+<b>Attributes </b>: 
+<ul>
+  <li>POSITION</li>
+  <li>ROTATION</li>
+  <li>SCALE</li>
+</ul>
+
+<b>Optional parameters </b>: 
+<ul>
+  <li>Custom interpolator function and its params</li>
+  <li>Ease function strength</li>
+  <li>Callback action</li>
+</ul>
+
 <b>Usage </b>: 
 <ul>
   <li>Assign <b>Interpolator.cs</b> to a gameobject in the scene</li>

@@ -8,9 +8,16 @@ Interpolates transform's position, rotation or scale over a period of time.
   <li>EASE IN</li>
   <li>EASE OUT</li>
 </ul>
-<b>EASE IN and EASE OUT follow following equation</b>
-<b>By default strength of the curve is set to 3</b>
-<b>You can change it in AddTarget method</b>
+
+
+<b> EASE IN and EASE OUT follow following equation </b> <br>
+
+![Failed to load image](IMG/Untitled.png)
+
+<b>By default strength of the curve is set to 3 <br>
+You can change it in AddTarget method <br>
+</b>
+<br>
 
 <b>Attributes </b>: 
 <ul>

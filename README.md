@@ -2,6 +2,9 @@
 
 Interpolates transform's position, rotation or scale over a period of time.
 
+![Failed to load gif](IMG/GIF.gif)
+GIF frame rate is 15, actual video is not laggy
+
 <b>Interpolation Types (inbuilt) </b>: 
 <ul>
   <li>LINEAR</li>

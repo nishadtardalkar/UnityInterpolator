@@ -20,7 +20,7 @@ UPDATE : Added interpolation support for float variables.
 ![Failed to load image](IMG/Untitled.png)
 
 <b>By default strength of the curve is set to 3 <br>
-You can change it in AddTarget method <br>
+You can specify it while calling AddTarget method <br>
 </b>
 <br>
 

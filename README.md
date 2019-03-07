@@ -5,6 +5,8 @@ Interpolates transform's position, rotation or scale over a period of time.
 ![Failed to load gif](IMG/GIF.gif)
 GIF frame rate is 15, actual video is not laggy
 
+UPDATE : Added interpolation support for float variables.
+
 <b>Interpolation Types (inbuilt) </b>: 
 <ul>
   <li>LINEAR</li>
@@ -26,7 +28,8 @@ You can change it in AddTarget method <br>
 <ul>
   <li>POSITION</li>
   <li>ROTATION</li>
-  <li>SCALE</li>
+  <li>SCALE</li>  
+  <li>FLOAT</li>
 </ul>
 
 <b>Optional parameters </b>: 

@@ -1,6 +1,6 @@
 # Unity Transform Interpolator
 
-Interpolates transform's position, rotation or scale over a period of time.
+Interpolates transform's position, rotation, scale or a float field over a period of time.
 
 ![Failed to load gif](IMG/GIF.gif)
 GIF frame rate is 15, actual video is not laggy

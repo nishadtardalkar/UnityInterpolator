@@ -53,7 +53,7 @@ public class Interpolator : MonoBehaviour
             nTarget.target = (Vector3)target;
             if (attribute == Attribute.POSITION) { nTarget.init = nTarget.toChange.position; }
             else if (attribute == Attribute.SCALE) { nTarget.init = nTarget.toChange.localScale; }
-            else if (attribute == Attribute.ROTATION) { nTarget.init = nTarget.toChange.rotation.eulerAngles; }
+            else if (attribute == Attribute.ROTATION) { nTarget.init = nTarget.toChange.localRotation.eulerAngles; }
         }
 
         int id = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
@@ -85,105 +85,6 @@ public class Interpolator : MonoBehaviour
 
     void Update()
     {
-        /*
-        for (int i = 0; i < targets.Count; i++)
-        {
-            if (targets[i].attribute == Attribute.FLOAT)
-            {
-                float current = (float)targets[i].cField.GetValue(targets[i].cToChange);
-                float delta = 0;
-                if (targets[i].interpolationType == InterpolationType.LINEAR)
-                {
-                    delta = (targets[i].cTarget - targets[i].cInit) * Time.deltaTime / targets[i].time;
-                }
-                else if (targets[i].interpolationType == InterpolationType.EASEOUT)
-                {
-                    float x = (Time.time - targets[i].initTime) / targets[i].time;
-                    float m = 1 - ((1 - x) / Mathf.Pow(1f + (targets[i].easeStrength * x), 2f));
-                    delta = (targets[i].cTarget - targets[i].cInit) * m - current + targets[i].cInit;
-                }
-                else if (targets[i].interpolationType == InterpolationType.EASEIN)
-                {
-                    float x = 1 - ((Time.time - targets[i].initTime) / targets[i].time);
-                    float m = 1 - (1 - ((1 - x) / Mathf.Pow(1f + (targets[i].easeStrength * x), 2f)));
-                    delta = (targets[i].cTarget - targets[i].cInit) * m - current + targets[i].cInit;
-                }
-                else if (targets[i].interpolationType == InterpolationType.CUSTOM)
-                {
-                    targets[i].customInterpolator(targets[i].customParams);
-                    delta = (float)targets[i].customParams["RETURN"] - current;
-                }
-                if (Mathf.Abs(targets[i].cTarget - current) > Math.Abs(delta))
-                {
-                    targets[i].cField.SetValue(targets[i].cToChange, current + delta);
-                }
-                else
-                {
-                    targets[i].cField.SetValue(targets[i].cToChange, targets[i].cTarget);
-                    targets.RemoveAt(i--);
-                }
-            }
-            else
-            {
-                Vector3 current = (targets[i].attribute == Attribute.POSITION) ? (targets[i].toChange.position) : ((targets[i].attribute == Attribute.ROTATION) ? (targets[i].toChange.rotation.eulerAngles) : (targets[i].toChange.localScale));
-                Vector3 delta = Vector3.zero;
-
-                if (targets[i].interpolationType == InterpolationType.LINEAR)
-                {
-                    delta = (targets[i].target - targets[i].init) * Time.deltaTime / targets[i].time;
-                }
-                else if (targets[i].interpolationType == InterpolationType.EASEOUT)
-                {
-                    float x = (Time.time - targets[i].initTime) / targets[i].time;
-                    float m = 1 - ((1 - x) / Mathf.Pow(1f + (targets[i].easeStrength * x), 2f));
-                    delta = (targets[i].target - targets[i].init) * m - current + targets[i].init;
-                }
-                else if (targets[i].interpolationType == InterpolationType.EASEIN)
-                {
-                    float x = 1 - ((Time.time - targets[i].initTime) / targets[i].time);
-                    float m = 1 - (1 - ((1 - x) / Mathf.Pow(1f + (targets[i].easeStrength * x), 2f)));
-                    delta = (targets[i].target - targets[i].init) * m - current + targets[i].init;
-                }
-                else if (targets[i].interpolationType == InterpolationType.CUSTOM)
-                {
-                    targets[i].customInterpolator(targets[i].customParams);
-                    delta = (Vector3)targets[i].customParams["RETURN"] - current;
-                }
-
-                if (Vector3.Distance(current, targets[i].target) > delta.magnitude)
-                {
-                    if (targets[i].attribute == Attribute.POSITION)
-                    {
-                        targets[i].toChange.position += delta;
-                    }
-                    else if (targets[i].attribute == Attribute.ROTATION)
-                    {
-                        targets[i].toChange.rotation = Quaternion.Euler(targets[i].toChange.rotation.eulerAngles + delta);
-                    }
-                    else if (targets[i].attribute == Attribute.SCALE)
-                    {
-                        targets[i].toChange.localScale += delta;
-                    }
-                }
-                else
-                {
-                    if (targets[i].attribute == Attribute.POSITION)
-                    {
-                        targets[i].toChange.position = targets[i].target;
-                    }
-                    else if (targets[i].attribute == Attribute.ROTATION)
-                    {
-                        targets[i].toChange.rotation = Quaternion.Euler(targets[i].target);
-                    }
-                    else if (targets[i].attribute == Attribute.SCALE)
-                    {
-                        targets[i].toChange.localScale = targets[i].target;
-                    }
-                    targets.RemoveAt(i--);
-                }
-            }
-        }
-        */
         object[] keys = new object[targets.Keys.Count];
         targets.Keys.CopyTo(keys, 0);
         foreach (object i in keys) 
@@ -225,7 +126,7 @@ public class Interpolator : MonoBehaviour
             }
             else
             {
-                Vector3 current = (targets[i].attribute == Attribute.POSITION) ? (targets[i].toChange.position) : ((targets[i].attribute == Attribute.ROTATION) ? (targets[i].toChange.rotation.eulerAngles) : (targets[i].toChange.localScale));
+                Vector3 current = (targets[i].attribute == Attribute.POSITION) ? (targets[i].toChange.position) : ((targets[i].attribute == Attribute.ROTATION) ? (targets[i].toChange.localRotation.eulerAngles) : (targets[i].toChange.localScale));
                 Vector3 delta = Vector3.zero;
 
                 if (targets[i].interpolationType == InterpolationType.LINEAR)
@@ -258,7 +159,7 @@ public class Interpolator : MonoBehaviour
                     }
                     else if (targets[i].attribute == Attribute.ROTATION)
                     {
-                        targets[i].toChange.rotation = Quaternion.Euler(targets[i].toChange.rotation.eulerAngles + delta);
+                        targets[i].toChange.localRotation = Quaternion.Euler(targets[i].toChange.localRotation.eulerAngles + delta);
                     }
                     else if (targets[i].attribute == Attribute.SCALE)
                     {
@@ -273,7 +174,7 @@ public class Interpolator : MonoBehaviour
                     }
                     else if (targets[i].attribute == Attribute.ROTATION)
                     {
-                        targets[i].toChange.rotation = Quaternion.Euler(targets[i].target);
+                        targets[i].toChange.localRotation = Quaternion.Euler(targets[i].target);
                     }
                     else if (targets[i].attribute == Attribute.SCALE)
                     {

@@ -53,7 +53,7 @@ public class Interpolator : MonoBehaviour
             nTarget.target = (Vector3)target;
             if (attribute == Attribute.POSITION) { nTarget.init = nTarget.toChange.position; }
             else if (attribute == Attribute.SCALE) { nTarget.init = nTarget.toChange.localScale; }
-            else if (attribute == Attribute.ROTATION) { nTarget.init = nTarget.toChange.localRotation.eulerAngles; }
+            else if (attribute == Attribute.ROTATION) { nTarget.init = nTarget.toChange.rotation.eulerAngles; }
         }
 
         int id = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
@@ -126,7 +126,7 @@ public class Interpolator : MonoBehaviour
             }
             else
             {
-                Vector3 current = (targets[i].attribute == Attribute.POSITION) ? (targets[i].toChange.position) : ((targets[i].attribute == Attribute.ROTATION) ? (targets[i].toChange.localRotation.eulerAngles) : (targets[i].toChange.localScale));
+                Vector3 current = (targets[i].attribute == Attribute.POSITION) ? (targets[i].toChange.position) : ((targets[i].attribute == Attribute.ROTATION) ? (targets[i].toChange.rotation.eulerAngles) : (targets[i].toChange.localScale));
                 Vector3 delta = Vector3.zero;
 
                 if (targets[i].interpolationType == InterpolationType.LINEAR)
@@ -159,7 +159,7 @@ public class Interpolator : MonoBehaviour
                     }
                     else if (targets[i].attribute == Attribute.ROTATION)
                     {
-                        targets[i].toChange.localRotation = Quaternion.Euler(targets[i].toChange.localRotation.eulerAngles + delta);
+                        targets[i].toChange.rotation = Quaternion.Euler(targets[i].toChange.rotation.eulerAngles + delta);
                     }
                     else if (targets[i].attribute == Attribute.SCALE)
                     {
@@ -174,7 +174,7 @@ public class Interpolator : MonoBehaviour
                     }
                     else if (targets[i].attribute == Attribute.ROTATION)
                     {
-                        targets[i].toChange.localRotation = Quaternion.Euler(targets[i].target);
+                        targets[i].toChange.rotation = Quaternion.Euler(targets[i].target);
                     }
                     else if (targets[i].attribute == Attribute.SCALE)
                     {

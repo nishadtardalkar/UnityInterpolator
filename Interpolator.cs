@@ -33,6 +33,8 @@ public class Interpolator : MonoBehaviour
 
         public Func<float> getValue;
         public Action<float> setValue;
+
+        public Action callback;
     }
     private static Dictionary<object, Target> targets = new Dictionary<object, Target>();
 
@@ -43,7 +45,8 @@ public class Interpolator : MonoBehaviour
         FieldInfo field = null,
         bool cancelPrevious = true,
         Func<float> getValue = null,
-        Action<float> setValue = null)
+        Action<float> setValue = null,
+        Action callback = null)
     {
         Target nTarget = new Target();
         nTarget.attribute = attribute;
@@ -56,6 +59,7 @@ public class Interpolator : MonoBehaviour
         nTarget.percent = 0f;
         nTarget.active = true;
         nTarget.nextActive = -1;
+        nTarget.callback = callback;
 
         if (attribute == Attribute.FLOAT)
         {
@@ -104,7 +108,9 @@ public class Interpolator : MonoBehaviour
                 {
                     if (cancelPrevious)
                     {
+                        Action action = targets[t].callback;
                         targets.Remove(t);
+                        action?.Invoke();
                     }
                     else
                     {
@@ -120,7 +126,9 @@ public class Interpolator : MonoBehaviour
             {
                 if (cancelPrevious)
                 {
+                    Action action = targets[t].callback;
                     targets.Remove(t);
+                    action?.Invoke();
                 }
                 else 
                 {
@@ -137,6 +145,11 @@ public class Interpolator : MonoBehaviour
         return id;
     }
 
+    public static void ClearAll()
+    {
+        targets.Clear();
+    }
+
     public static bool IsActive(object id)
     {
         if (targets.ContainsKey(id))
@@ -146,11 +159,13 @@ public class Interpolator : MonoBehaviour
         return false;
     }
 
-    public static void RemoveTarget(object id)
+    public static void RemoveTarget(object id, bool doCallback)
     {
         if (targets.ContainsKey(id))
         {
+            Action action = targets[id].callback;
             targets.Remove(id);
+            if (doCallback) { action?.Invoke(); }
         }
     }
 
@@ -197,7 +212,9 @@ public class Interpolator : MonoBehaviour
                     {
                         targets[targets[i].nextActive].active = true;
                     }
+                    Action action = targets[i].callback;
                     targets.Remove(i);
+                    action?.Invoke();
                 }
             }
             else if (targets[i].attribute == Attribute.NULL)
@@ -236,11 +253,20 @@ public class Interpolator : MonoBehaviour
                     {
                         targets[targets[i].nextActive].active = true;
                     }
+                    Action action = targets[i].callback;
                     targets.Remove(i);
+                    action?.Invoke();
                 }
             }
             else
             {
+                if (targets[i].toChange == null)
+                {
+                    Action action = targets[i].callback;
+                    targets.Remove(i);
+                    action?.Invoke();
+                    continue;
+                }
                 //Vector3 current = (targets[i].attribute == Attribute.POSITION) ? (targets[i].toChange.position) : ((targets[i].attribute == Attribute.ROTATION) ? (targets[i].toChange.rotation.eulerAngles) : (targets[i].toChange.localScale));
                 Vector3 delta = Vector3.zero;
                 if (targets[i].interpolationType == InterpolationType.LINEAR)
@@ -270,6 +296,7 @@ public class Interpolator : MonoBehaviour
                 }
 
                 //if (Time.time - targets[i].initTime < targets[i].time) 
+                delta = (delta.magnitude < 0.00001f) ? (delta.normalized * 0.00001f) : (delta);
                 if (Vector3.Distance(targets[i].target, targets[i].current) > delta.magnitude)
                 {
                     if (targets[i].attribute == Attribute.POSITION)
@@ -308,7 +335,9 @@ public class Interpolator : MonoBehaviour
                     {
                         targets[targets[i].nextActive].active = true;
                     }
+                    Action action = targets[i].callback;
                     targets.Remove(i);
+                    action?.Invoke();
                 }
             }
         }

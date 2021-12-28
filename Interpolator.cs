@@ -35,6 +35,8 @@ public class Interpolator : MonoBehaviour
         public Action<float> setValue;
 
         public Action callback;
+        public Action<float> stepCallbackFloat;
+        public Action<Vector3> stepCallbackVector;
     }
     private static Dictionary<object, Target> targets = new Dictionary<object, Target>();
 
@@ -46,7 +48,10 @@ public class Interpolator : MonoBehaviour
         bool cancelPrevious = true,
         Func<float> getValue = null,
         Action<float> setValue = null,
-        Action callback = null)
+        Action callback = null,
+        Action<float> stepCallbackFloat = null,
+        Action<Vector3> stepCallbackVector = null,
+        bool invokePrevious = true)
     {
         Target nTarget = new Target();
         nTarget.attribute = attribute;
@@ -60,6 +65,8 @@ public class Interpolator : MonoBehaviour
         nTarget.active = true;
         nTarget.nextActive = -1;
         nTarget.callback = callback;
+        nTarget.stepCallbackFloat = stepCallbackFloat;
+        nTarget.stepCallbackVector = stepCallbackVector;
 
         if (attribute == Attribute.FLOAT)
         {
@@ -100,43 +107,52 @@ public class Interpolator : MonoBehaviour
             id = UnityEngine.Random.Range(0, int.MaxValue);
         }
         List<object> keys = new List<object>(targets.Keys);
-        foreach (object t in keys)
+        if (attribute != Attribute.NULL)
         {
-            if (attribute == Attribute.FLOAT)
+            foreach (object t in keys)
             {
-                if (targets[t].cToChange == toChange)
+                if (attribute == Attribute.FLOAT)
+                {
+                    if (targets[t].cToChange == toChange)
+                    {
+                        if (cancelPrevious)
+                        {
+                            Action action = targets[t].callback;
+                            targets.Remove(t);
+                            if (invokePrevious)
+                            {
+                                action?.Invoke();
+                            }
+                        }
+                        else
+                        {
+                            Target x = targets[t];
+                            while (x.nextActive != -1) { x = targets[x.nextActive]; }
+                            nTarget.active = false;
+                            x.nextActive = id;
+                            break;
+                        }
+                    }
+                }
+                else if (targets[t].toChange == (Transform)toChange && targets[t].attribute == attribute)
                 {
                     if (cancelPrevious)
                     {
                         Action action = targets[t].callback;
                         targets.Remove(t);
-                        action?.Invoke();
+                        if (invokePrevious)
+                        {
+                            action?.Invoke();
+                        }
                     }
                     else
                     {
-                        Target x = targets[t];
-                        while (x.nextActive != -1) { x = targets[x.nextActive]; }
+                        object x = t;
+                        while (targets[x].nextActive != -1) { x = targets[x].nextActive; }
                         nTarget.active = false;
-                        x.nextActive = id;
+                        targets[x].nextActive = id;
                         break;
                     }
-                }
-            }
-            else if (targets[t].toChange == (Transform)toChange && targets[t].attribute == attribute)
-            {
-                if (cancelPrevious)
-                {
-                    Action action = targets[t].callback;
-                    targets.Remove(t);
-                    action?.Invoke();
-                }
-                else 
-                {
-                    object x = t;
-                    while (targets[x].nextActive != -1) { x = targets[x].nextActive; }
-                    nTarget.active = false;
-                    targets[x].nextActive = id;
-                    break;
                 }
             }
         }
@@ -175,7 +191,8 @@ public class Interpolator : MonoBehaviour
         targets.Keys.CopyTo(keys, 0);
         foreach (object i in keys) 
         {
-            if (!targets[i].active) { continue; }
+            if (!targets.ContainsKey(i)) { continue; }
+            if (!targets[i].active) { RemoveTarget(i, false); continue; }
             if (targets[i].attribute == Attribute.FLOAT)
             {
                 float current = (float)targets[i].cField.GetValue(targets[i].cToChange);
@@ -203,10 +220,12 @@ public class Interpolator : MonoBehaviour
                 }
                 if (Mathf.Abs(targets[i].cTarget - current) > Math.Abs(delta))
                 {
+                    targets[i].stepCallbackFloat?.Invoke(delta);
                     targets[i].cField.SetValue(targets[i].cToChange, current + delta);
                 }
                 else
                 {
+                    targets[i].stepCallbackFloat?.Invoke(delta);
                     targets[i].cField.SetValue(targets[i].cToChange, targets[i].cTarget);
                     if (targets[i].nextActive != -1)
                     {
@@ -244,10 +263,12 @@ public class Interpolator : MonoBehaviour
                 }
                 if (Mathf.Abs(targets[i].cTarget - current) > Math.Abs(delta))
                 {
+                    targets[i].stepCallbackFloat?.Invoke(delta);
                     targets[i].setValue(current + delta);
                 }
                 else
                 {
+                    targets[i].stepCallbackFloat?.Invoke(delta);
                     targets[i].setValue(targets[i].cTarget);
                     if (targets[i].nextActive != -1)
                     {
@@ -299,6 +320,7 @@ public class Interpolator : MonoBehaviour
                 delta = (delta.magnitude < 0.00001f) ? (delta.normalized * 0.00001f) : (delta);
                 if (Vector3.Distance(targets[i].target, targets[i].current) > delta.magnitude)
                 {
+                    targets[i].stepCallbackVector?.Invoke(delta);
                     if (targets[i].attribute == Attribute.POSITION)
                     {
                         targets[i].toChange.position += delta;
@@ -319,6 +341,7 @@ public class Interpolator : MonoBehaviour
                 }
                 else
                 {
+                    targets[i].stepCallbackVector?.Invoke(targets[i].target - targets[i].current);
                     if (targets[i].attribute == Attribute.POSITION)
                     {
                         targets[i].toChange.position = targets[i].target;
